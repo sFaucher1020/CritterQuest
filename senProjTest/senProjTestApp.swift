@@ -1,14 +1,14 @@
 //
-//  senProjTestApp.swift
-//  senProjTest
+//  CritterQuestApp.swift
+//  CritterQuest
 //
-//  Created by Samuel Faucher on 12/29/23.
+//  Created by Samuel Faucher on 1/31/24.
 //
 
 import SwiftUI
 
 @main
-struct senProjTestApp: App {
+struct CritterQuestApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()

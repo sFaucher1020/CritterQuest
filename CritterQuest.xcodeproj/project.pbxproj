@@ -14,6 +14,7 @@
 		64124A382B3EEC4100A2C53C /* senProjTestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64124A372B3EEC4100A2C53C /* senProjTestTests.swift */; };
 		64124A422B3EEC4100A2C53C /* senProjTestUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64124A412B3EEC4100A2C53C /* senProjTestUITests.swift */; };
 		64124A442B3EEC4100A2C53C /* senProjTestUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64124A432B3EEC4100A2C53C /* senProjTestUITestsLaunchTests.swift */; };
+		64224D8B2B6C5AC7005356E3 /* Location.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64224D8A2B6C5AC7005356E3 /* Location.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,6 +45,7 @@
 		64124A3D2B3EEC4100A2C53C /* senProjTestUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = senProjTestUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		64124A412B3EEC4100A2C53C /* senProjTestUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = senProjTestUITests.swift; sourceTree = "<group>"; };
 		64124A432B3EEC4100A2C53C /* senProjTestUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = senProjTestUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		64224D8A2B6C5AC7005356E3 /* Location.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Location.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -96,6 +98,7 @@
 			children = (
 				64124A262B3EEC4000A2C53C /* senProjTestApp.swift */,
 				64124A282B3EEC4000A2C53C /* ContentView.swift */,
+				64224D8A2B6C5AC7005356E3 /* Location.swift */,
 				64124A2A2B3EEC4100A2C53C /* Assets.xcassets */,
 				64124A2C2B3EEC4100A2C53C /* Preview Content */,
 			);
@@ -206,7 +209,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 64124A1E2B3EEC4000A2C53C /* Build configuration list for PBXProject "senProjTest" */;
+			buildConfigurationList = 64124A1E2B3EEC4000A2C53C /* Build configuration list for PBXProject "CritterQuest" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -258,6 +261,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				64124A292B3EEC4000A2C53C /* ContentView.swift in Sources */,
+				64224D8B2B6C5AC7005356E3 /* Location.swift in Sources */,
 				64124A272B3EEC4000A2C53C /* senProjTestApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -425,6 +429,8 @@
 				DEVELOPMENT_TEAM = U24KL52Y98;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSLocationUsageDescription = "This application requires your location to function";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Shows the users location.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -454,6 +460,8 @@
 				DEVELOPMENT_TEAM = U24KL52Y98;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSLocationUsageDescription = "This application requires your location to function";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Shows the users location.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -551,7 +559,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		64124A1E2B3EEC4000A2C53C /* Build configuration list for PBXProject "senProjTest" */ = {
+		64124A1E2B3EEC4000A2C53C /* Build configuration list for PBXProject "CritterQuest" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				64124A452B3EEC4100A2C53C /* Debug */,
