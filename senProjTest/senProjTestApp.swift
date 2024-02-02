@@ -9,9 +9,11 @@ import SwiftUI
 
 @main
 struct CritterQuestApp: App {
+    @StateObject var locationManager = LocationManager()
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(locationManager)
         }
     }
 }
