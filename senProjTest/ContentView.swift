@@ -7,6 +7,7 @@
 
 import SwiftUI
 import CoreLocation
+
 import MapKit
 
 struct ContentView: View {
@@ -18,13 +19,27 @@ struct ContentView: View {
     //gets users current gps pos
     @State private var position: MapCameraPosition = .userLocation(fallback: .automatic)
     
+    //self explanatory
+    @State private var sheetVisible = false
+    
+    //holds current tapped coord
+    @State private var tappedCoord: CLLocationCoordinate2D?
+    
+    
+    //checks to see if the screen has been tapped
+    @State private var pinInProgress = false
+    
+    //variables for pin name, field, and desc
+    @State var pinNameField = ""
+    @State var pinName = ""
+    @State var pinDesc = ""
+    
     //creates a list of current locations that have been pinned
     @State private var locations = [Location]()
     
     @State var toggle = false
     
     var body: some View {
-        ZStack{
             MapReader { proxy in
                 //initialized map view
                 Map(initialPosition: position){
@@ -36,65 +51,72 @@ struct ContentView: View {
                                 latitude: location.latitude,
                                 longitude: location.longitude))
                     }
-                //gives map functionality -- BROKEN BROKEN
                     
                 }.mapStyle(toggle ? .hybrid : .standard)
                 
                 //when map is tapped -- creates a pin on the tapped location
-                .onTapGesture { position in
-                    //takes screen position
-                    if let coordinate = proxy.convert(position, from: .local){
-                        //converts screen position to coordinate
-                        let newLocation = Location(id: UUID(), name: "New Pin", description: "", latitude: coordinate.latitude, longitude: coordinate.longitude)
-                        print("Coordinate Placed at \(coordinate.latitude), \(coordinate.longitude), at \(dateTime)")
-                        //adds new tapped location to list
-                        locations.append(newLocation)
-                    }
+                
+                    .onTapGesture { position in
+                        //takes screen position
+                        if let coordinate = proxy.convert(position, from: .local){
+                            
+                            //print(coordinate)
+                            self.tappedCoord = coordinate
+                            self.sheetVisible.toggle()
+                            self.pinInProgress = true
+                            //print(coordinate, ": 1")
+                            
+                        }
+                    }.sheet(isPresented: $sheetVisible, content: {
+                        VStack{
+                            //doesnt place the pin until user is done
+                            if pinInProgress {
+                                VStack{
+                                    HStack{
+                                        Text("New Pin").presentationDetents([.height(300)])
+                                        Spacer()
+                                    }
+                                    
+                                    HStack{
+                                        TextField(" Bear, Eagle, Fox, etc", text: $pinNameField)
+                                            .border(Color.black)
+                                            .padding(10)
+                                            .keyboardType(.default)
+                                    }
+                                    HStack{
+                                        Text("Pin Description").presentationDetents([.height(300)])
+                                        Spacer()
+                                    }
+                                    HStack{
+                                        TextField(" had babies, was grazing, etc", text: $pinDesc)
+                                            .border(Color.black)
+                                            .padding(10)
+                                            .keyboardType(.default)
+                                    }
+                                    
+                                    //submits all textfield info
+                                    Button(action: {
+                                        //only if pin is named!
+                                        //desc optional
+                                        if !pinNameField.isEmpty{
+                                            let newLocation = Location(id: UUID(), name: pinNameField, description: pinDesc, latitude: tappedCoord?.latitude ?? 0.0, longitude: tappedCoord?.longitude ?? 0.0)
+                                            locations.append(newLocation)
+                                            print("New pin: \(newLocation.name) at \(newLocation.longitude), \(newLocation.latitude)")
+                                        }
+                                        pinNameField = ""
+                                        pinDesc = ""
+                                        sheetVisible = false
+                                        pinInProgress = false
+                                    }, label: {
+                                        Text("Submit")
+                                    })
+                                }
+                            }
+                        }
+                    })
                 //when map starts, request location permissions
-                }.onAppear(){CLLocationManager().requestWhenInUseAuthorization()}
+            }.onAppear(){CLLocationManager().requestWhenInUseAuthorization()
                 
-                //temporary NAV BAR
-                //will implement "Picker" Later
-                HStack{
-                    Spacer()
-                    
-                    Button("", systemImage: "map"){
-                        print("Clicked on map button")
-                    }.padding(15).bold()
-                    
-                    Spacer()
-                    
-                    Button("",systemImage: "pin"){
-                        print("Clicked on pins button")
-                    }.bold()
-                    
-                    Spacer()
-                    
-                    Button("", systemImage: "person"){
-                        print("Clicked on profile button")
-                    }.bold()
-                    
-                    Spacer()
-                }
-            }
-            VStack{
-                HStack{
-                    Toggle("", isOn: $toggle).toggleStyle(SwitchToggleStyle(tint: .blue)).toggleStyle(.automatic).padding(20).labelsHidden()
-                    
-                    Spacer()
-                    
-                    Text("Current Coordinates: \(locationManager.location?.coordinate.latitude ?? 0.0), \(locationManager.location?.coordinate.longitude ?? 0.0)")
-                    
-                    Spacer()
-                    
-                    Button("", systemImage: "location"){
-                    //make the button return to users curr position
-                
-                        
-                    }.buttonStyle(.borderedProminent).padding(20).labelsHidden()
-                }
-                Spacer()
-            }
         }
     }
 }
