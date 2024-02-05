@@ -3,6 +3,7 @@
 //  CritterQuest
 //
 //  Created by Samuel Faucher on 1/31/24.
+//  Date is wrong ^, had to move code to new file
 //
 
 import SwiftUI
@@ -73,24 +74,26 @@ struct ContentView: View {
                             if pinInProgress {
                                 VStack{
                                     HStack{
-                                        Text("New Pin").presentationDetents([.height(300)])
+                                        Text("New Pin").presentationDetents([.height(200)]).padding(.top).padding(.horizontal)
                                         Spacer()
                                     }
                                     
                                     HStack{
                                         TextField(" Bear, Eagle, Fox, etc", text: $pinNameField)
-                                            .border(Color.black)
-                                            .padding(10)
+                                            .border(Color.blue)
+                                            .textFieldStyle(.roundedBorder)
+                                            .padding(.horizontal)
                                             .keyboardType(.default)
                                     }
                                     HStack{
-                                        Text("Pin Description").presentationDetents([.height(300)])
+                                        Text("Pin Description").presentationDetents([.height(300)]).padding(.horizontal)
                                         Spacer()
                                     }
                                     HStack{
                                         TextField(" had babies, was grazing, etc", text: $pinDesc)
-                                            .border(Color.black)
-                                            .padding(10)
+                                            .border(Color.blue)
+                                            .textFieldStyle(.roundedBorder)
+                                            .padding(.horizontal)
                                             .keyboardType(.default)
                                     }
                                     
@@ -108,8 +111,9 @@ struct ContentView: View {
                                         sheetVisible = false
                                         pinInProgress = false
                                     }, label: {
-                                        Text("Submit")
-                                    })
+                                        Label("Submit", systemImage: "pin")
+                                    }).buttonStyle(.borderedProminent)
+                                    Spacer()
                                 }
                             }
                         }
