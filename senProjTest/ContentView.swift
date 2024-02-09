@@ -8,10 +8,11 @@
 
 import SwiftUI
 import CoreLocation
-
 import MapKit
+import SwiftData
 
 struct ContentView: View {
+    @Environment(\.modelContext) var ctx
     
     @EnvironmentObject var locationManager: LocationManager
     
@@ -36,38 +37,49 @@ struct ContentView: View {
     @State var pinDesc = ""
     
     //creates a list of current locations that have been pinned
-    @State private var locations = [Location]()
-    
+
     @State var toggle = false
     
+    //pulls from SwiftData
+    @Query private var pins : [PinDB]
+    
     var body: some View {
+        NavigationView {
             MapReader { proxy in
                 //initialized map view
-                Map(initialPosition: position){
-                    //iterate through the list of coords
-                    ForEach(locations) { location in
-                        //creates a marker for each pin in locations
-                        Marker(location.name,
-                               coordinate: CLLocationCoordinate2D(
-                                latitude: location.latitude,
-                                longitude: location.longitude))
+                ZStack {
+                    
+                    Color.gray.ignoresSafeArea()
+                    
+                    Map(initialPosition: position){
+                        //iterate through the list of coords
+                        ForEach(pins) { pin in
+                            Marker(pin.name, coordinate: CLLocationCoordinate2D(latitude: pin.lat, longitude: pin.long))
+                        }
+                        
+                    }
+                    .mapStyle(toggle ? .hybrid : .standard)
+                    .mapControls(){
+                        MapUserLocationButton().padding(10)
+                        MapCompass().padding(10)
                     }
                     
-                }.mapStyle(toggle ? .hybrid : .standard)
-                
-                //when map is tapped -- creates a pin on the tapped location
-                
+                    //when map is tapped, calculates screen coord with real coords
                     .onTapGesture { position in
                         //takes screen position
                         if let coordinate = proxy.convert(position, from: .local){
                             
                             //print(coordinate)
+                            
+                            //saves important info
                             self.tappedCoord = coordinate
                             self.sheetVisible.toggle()
                             self.pinInProgress = true
                             //print(coordinate, ": 1")
                             
                         }
+                        //slides sheet up to allow users to name and describe
+                        //what they pinned
                     }.sheet(isPresented: $sheetVisible, content: {
                         VStack{
                             //doesnt place the pin until user is done
@@ -100,14 +112,20 @@ struct ContentView: View {
                                     //submits all textfield info
                                     Button(action: {
                                         //only if pin is named!
-                                        //desc optional
+                                        //desc optional tho
                                         if !pinNameField.isEmpty{
-                                            let newLocation = Location(id: UUID(), name: pinNameField, description: pinDesc, latitude: tappedCoord?.latitude ?? 0.0, longitude: tappedCoord?.longitude ?? 0.0)
-                                            locations.append(newLocation)
-                                            print("New pin: \(newLocation.name) at \(newLocation.longitude), \(newLocation.latitude)")
+                                            //populates SwiftData DB "PinDB"
+                                            let newPin = PinDB(name: pinNameField, desc: pinDesc, lat: tappedCoord?.latitude ?? 0.0, long: tappedCoord?.longitude ?? 0.0, date: dateTime)
+                                            ctx.insert(newPin)
+                                            
                                         }
+                                        
+                                        
+                                        //resets all textfields and names
                                         pinNameField = ""
                                         pinDesc = ""
+                                        //sets bools back to false :)
+                                        //cleanup before next pin
                                         sheetVisible = false
                                         pinInProgress = false
                                     }, label: {
@@ -116,12 +134,23 @@ struct ContentView: View {
                                     Spacer()
                                 }
                             }
+                            
                         }
+                        
                     })
-                //when map starts, request location permissions
-            }.onAppear(){CLLocationManager().requestWhenInUseAuthorization()
-                
-        }
+                    
+                }
+                    NavigationLink(destination: pinListView()) {
+                            HStack {
+                                Label("Edit Pins", systemImage: "pencil").padding(10).background(Color.blue).foregroundStyle(.white).clipShape(RoundedRectangle(cornerRadius: 20.0)).labelStyle(.automatic).font(.system(size: 25))
+                            }.padding(.horizontal)
+                }
+                    
+                }
+                    
+                    //when map starts, request location permissions
+                }.onAppear(){CLLocationManager().requestWhenInUseAuthorization()
+            }
     }
 }
 

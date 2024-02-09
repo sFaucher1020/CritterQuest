@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct CritterQuestApp: App {
@@ -14,6 +15,6 @@ struct CritterQuestApp: App {
         WindowGroup {
             ContentView()
                 .environmentObject(locationManager)
-        }
+        }.modelContainer(for: PinDB.self)
     }
 }
