@@ -50,6 +50,7 @@
 		64224D8A2B6C5AC7005356E3 /* Location.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Location.swift; sourceTree = "<group>"; };
 		64743AEE2B707B9A001784C3 /* PinDB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinDB.swift; sourceTree = "<group>"; };
 		64743AF02B75E093001784C3 /* pinListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = pinListView.swift; sourceTree = "<group>"; };
+		64743AF22B8D5CE7001784C3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -100,6 +101,7 @@
 		64124A252B3EEC4000A2C53C /* senProjTest */ = {
 			isa = PBXGroup;
 			children = (
+				64743AF22B8D5CE7001784C3 /* Info.plist */,
 				64124A262B3EEC4000A2C53C /* senProjTestApp.swift */,
 				64124A282B3EEC4000A2C53C /* ContentView.swift */,
 				64743AF02B75E093001784C3 /* pinListView.swift */,
@@ -437,6 +439,7 @@
 				DEVELOPMENT_TEAM = U24KL52Y98;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = senProjTest/Info.plist;
 				INFOPLIST_KEY_NSLocationUsageDescription = "This application requires your location to function";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "This app requires the users location for full functionality";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -468,6 +471,7 @@
 				DEVELOPMENT_TEAM = U24KL52Y98;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = senProjTest/Info.plist;
 				INFOPLIST_KEY_NSLocationUsageDescription = "This application requires your location to function";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "This app requires the users location for full functionality";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

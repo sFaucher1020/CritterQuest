@@ -22,6 +22,8 @@ struct pinListView: View {
                         Button(role: .destructive) {
                             withAnimation {
                                 ctx.delete(pin)
+                                
+                                
                             }
                         } label: {
                             Image(systemName: "trash")
