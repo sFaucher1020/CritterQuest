@@ -24,7 +24,11 @@ struct ContentView: View {
             }
             pinListView().tabItem {
                 Image(systemName: "pin.fill")
-                Text("Home")
+                Text("Edit Pins")
+            }
+            aliasChange().tabItem {
+                Image(systemName: "person.fill")
+                Text("Change Name")
             }
         }
         
@@ -35,5 +39,4 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
-        .environmentObject(LocationManager())
 }

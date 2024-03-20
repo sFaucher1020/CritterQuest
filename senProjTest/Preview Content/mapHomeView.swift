@@ -23,11 +23,6 @@ struct top: Codable{
     var pinLong: String
 }
 
-//struct catFact: Codable{
-//    var fact: String
-//    var length: Int
-//}
-
 struct mapHomeView: View {
     
     @State private var bottom = [top]()
@@ -55,6 +50,9 @@ struct mapHomeView: View {
     @State var pinNameField = ""
     @State var pinName = ""
     @State var pinDesc = ""
+    @State var pinid = ""
+    
+    @State private var pinIDs = [Int]()
     
 
     @State var toggle = false
@@ -70,11 +68,12 @@ struct mapHomeView: View {
                     Map(initialPosition: position){
                         
                         //iterate through the list of coords
-                        
                         ForEach(bottom, id: \.id) { pin in
+                            
                             if let latitude = Double(pin.pinLat), let longitude = Double(pin.pinLong) {
                                 Marker(pin.pinName, coordinate: CLLocationCoordinate2D(latitude: latitude, longitude: longitude))
                             }
+                            
                         }
                     }
                     //add mapcontrols, TODO:// Fix toggle
@@ -84,7 +83,6 @@ struct mapHomeView: View {
                         MapUserLocationButton().padding(10)
                         MapCompass().padding(10)
                     }
-                    
                     //when map is tapped, calculates screen coord with real coords
                     .onTapGesture { position in
                         //takes screen position
@@ -99,6 +97,8 @@ struct mapHomeView: View {
                         //slides sheet up to allow users to name and describe
                         //what they pinned
                     }.sheet(isPresented: $sheetVisible, content: {
+                        
+                        
                         VStack{
                             //doesnt place the pin until user is done
                             if pinInProgress {
@@ -178,9 +178,6 @@ struct mapHomeView: View {
                                                 print("Error: \(error.localizedDescription)")
                                             }
                                         }
-                                        
-                                        
-                                        
                                         //resets all textfields and names
                                         pinNameField = ""
                                         pinDesc = ""
@@ -220,20 +217,20 @@ struct mapHomeView: View {
             //decode data
             if let decodedResponse = try? JSONDecoder().decode([top].self, from: data) {
                 bottom = decodedResponse
+                
+                
+                print(bottom)
+                //print("This is bottom[0]  ", bottom[0])
             }
-//            print(data)
-//            print(bottom)
+
+            
         }catch {
             print("data not valid")
         }
-        
-        
-        
     }
-
+    
+    
 }
-
-
 #Preview {
     mapHomeView()
         .environmentObject(LocationManager())
