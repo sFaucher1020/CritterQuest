@@ -23,6 +23,12 @@ struct top: Codable{
     var pinLong: String
 }
 
+
+//struct catFact: Codable{
+//    var fact: String
+//    var length: Int
+//}
+
 struct mapHomeView: View {
     
     @State private var bottom = [top]()
@@ -53,29 +59,67 @@ struct mapHomeView: View {
     @State var pinid = ""
     
     @State private var pinIDs = [Int]()
-    
 
     @State var toggle = false
     
     @State var mapRefresh = true
     
+    var radius = ["All", "25mi", "50mi", "100mi"]
+    
+    @State private var disLat = 0.0
+    @State private var disLong = 0.0
+    
+    @State private var nLat = 0.0
+    @State private var nLong = 0.0
+    
+    @State private var a = 0.0
+    
+    @State private var rad = 0.0
+    
+    @State private var c = 0.0
+    
+    @State private var selectedRadius = "All"
     var body: some View {
+        
             MapReader { proxy in
-                //initialized map view
-                
                 ZStack {
+                    
                     //Initializes map and current posi
-                    Map(initialPosition: position){
-                        
-                        //iterate through the list of coords
-                        ForEach(bottom, id: \.id) { pin in
-                            
-                            if let latitude = Double(pin.pinLat), let longitude = Double(pin.pinLong) {
-                                Marker(pin.pinName, coordinate: CLLocationCoordinate2D(latitude: latitude, longitude: longitude))
+                    Map(initialPosition: position) {
+                            //iterate through the list of coords
+                            //ForEach(bottom, id: \.id) { pin in
+                                if selectedRadius == "All" {
+                                    ForEach(bottom, id: \.id) { pin in
+                                        if let latitude = Double(pin.pinLat), let longitude = Double(pin.pinLong) {
+                                            Marker(pin.pinName, coordinate: CLLocationCoordinate2D(latitude: latitude, longitude: longitude))
+                                        }
+                                    }
+                                }else if selectedRadius == "25mi"{
+                                    ForEach(bottom, id: \.id) { pin in
+                                        
+                                        //ERRORING
+                                        //let OUTPUT = distFromUser(userLat: locationManager.location?.coordinate.latitude ?? 0.0, userLong: locationManager.location?.coordinate.longitude ?? 0.0, pinLat: pin.pinLat, pinLong: pin.pinLong)
+                                            
+                                        //if(OUTPUT <= 25.0){
+                                            if let latitude = Double(pin.pinLat), let longitude = Double(pin.pinLong) {
+                                                Marker(pin.pinName, coordinate: CLLocationCoordinate2D(latitude: latitude, longitude: longitude))
+                                            }
+                                        //}
+                                    }
+                                }else if selectedRadius == "50mi"{
+                                    ForEach(bottom, id: \.id) { pin in
+                                        if let latitude = Double(pin.pinLat), let longitude = Double(pin.pinLong) {
+                                            Marker(pin.pinName, coordinate: CLLocationCoordinate2D(latitude: latitude, longitude: longitude))
+                                        }
+                                    }
+                                }else if selectedRadius == "100mi"{
+                                        ForEach(bottom, id: \.id) { pin in
+                                            if let latitude = Double(pin.pinLat), let longitude = Double(pin.pinLong) {
+                                                Marker(pin.pinName, coordinate: CLLocationCoordinate2D(latitude: latitude, longitude: longitude))
+                                            }
+                                        }
+                                }
                             }
-                            
-                        }
-                    }
                     //add mapcontrols, TODO:// Fix toggle
                     .mapStyle(toggle ? .hybrid : .standard)
                     .mapControls(){
@@ -97,8 +141,6 @@ struct mapHomeView: View {
                         //slides sheet up to allow users to name and describe
                         //what they pinned
                     }.sheet(isPresented: $sheetVisible, content: {
-                        
-                        
                         VStack{
                             //doesnt place the pin until user is done
                             if pinInProgress {
@@ -195,14 +237,48 @@ struct mapHomeView: View {
                         }
                         
                     })
+                    VStack{
+                        //Picker to select radius of pin
+                        Text("Pin Radius: \(selectedRadius)").font(.title).padding(.vertical)
+                        Picker("Please choose a Radius", selection: $selectedRadius) {
+                            ForEach(radius, id: \.self) {
+                                Text($0)
+                            }
+                        }.pickerStyle(.segmented).padding(.horizontal)
+                        
+                        Spacer()
+                    }
                     
                 }
             }.task {
-            await fetchData()
-            
+                await fetchData()
         //when map starts, request location permissions
         }.onAppear(){CLLocationManager().requestWhenInUseAuthorization()
             }
+        
+    }
+    
+    func distFromUser(userLat: Double, userLong: Double, pinLat: Double, pinLong: Double) -> Double{
+        
+        disLat = (pinLat - userLat) * Double.pi / 180.0
+        disLong = (pinLong - userLong) * Double.pi / 180.0
+        
+        //convert to radians
+        nLat = (userLat) * Double.pi / 180.0
+        nLong = (pinLat) * Double.pi / 180.0
+        
+        //how do i get cos and sin in swift AND square root and power
+        a = pow(sin(disLat/2), 2) + pow(sin(disLong/2), 2)*cos(pinLat)
+        
+        rad = 3959
+        
+        c = 2 * asin(sqrt(a))
+        
+        
+        
+        return Double(rad) * c
+        
+
     }
 
     func fetchData() async {
@@ -219,7 +295,7 @@ struct mapHomeView: View {
                 bottom = decodedResponse
                 
                 
-                print(bottom)
+                //print(bottom)
                 //print("This is bottom[0]  ", bottom[0])
             }
 
@@ -234,4 +310,5 @@ struct mapHomeView: View {
 #Preview {
     mapHomeView()
         .environmentObject(LocationManager())
+    
 }

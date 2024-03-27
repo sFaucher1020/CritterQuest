@@ -10,20 +10,19 @@ import SwiftData
 
 @Model
 class PinDB{
-    //let pinid: Int
+    //let alias: String
     let name: String
     let desc: String
     let lat: Double
     let long: Double
     let date: Date
     
-    init(/*pinid: Int,*/ name: String, desc: String, lat: Double, long: Double, date: Date) {
-        //self.pinid = pinid
+    init(/*alias: String,*/ name: String, desc: String, lat: Double, long: Double, date: Date) {
+        //self.alias = alias
         self.name = name
         self.desc = desc
         self.lat = lat
         self.long = long
         self.date = date
     }
-    
 }

@@ -26,8 +26,10 @@ struct pinListView: View {
     enum delError: Error {
         case invalid_Pin_ID
     }
-    
+    //let darkGreen = Color(red: 1.0/255.0, green: 68.0/255.0, blue: 33.0/255.0)
+
     var body: some View {
+        
         VStack {
             Label("My Pins", systemImage: "pin").padding().foregroundStyle(.blue).labelStyle(.automatic).font(.system(size: 25))
             NavigationStack{
@@ -50,7 +52,9 @@ struct pinListView: View {
                         }
                         Text(pin.desc)
                     }
-                }
+                    
+                }//.background(darkGreen)
+                //.scrollContentBackground(.hidden)
                 Spacer()
             }.searchable(text:$searchText)
         }
