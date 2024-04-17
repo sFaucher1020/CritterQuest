@@ -22,8 +22,6 @@ struct top: Codable{
     var pinLat: String
     var pinLong: String
 }
-
-
 //struct catFact: Codable{
 //    var fact: String
 //    var length: Int
@@ -58,6 +56,10 @@ struct mapHomeView: View {
     @State var pinDesc = ""
     @State var pinid = ""
     
+    @State var userLatitude = 0.0
+    
+    @State var userLongitute = 0.0
+    
     @State private var pinIDs = [Int]()
 
     @State var toggle = false
@@ -66,62 +68,48 @@ struct mapHomeView: View {
     
     var radius = ["All", "25mi", "50mi", "100mi"]
     
-    @State private var disLat = 0.0
-    @State private var disLong = 0.0
-    
-    @State private var nLat = 0.0
-    @State private var nLong = 0.0
-    
-    @State private var a = 0.0
-    
-    @State private var rad = 0.0
-    
-    @State private var c = 0.0
-    
     @State private var selectedRadius = "All"
+    
+    @State private var radiusSlider = 5.0
+    
+    @State private var isEditing = false
     var body: some View {
         
             MapReader { proxy in
                 ZStack {
-                    
                     //Initializes map and current posi
                     Map(initialPosition: position) {
                             //iterate through the list of coords
                             //ForEach(bottom, id: \.id) { pin in
-                                if selectedRadius == "All" {
+                        if radiusSlider == 100.0 {
                                     ForEach(bottom, id: \.id) { pin in
                                         if let latitude = Double(pin.pinLat), let longitude = Double(pin.pinLong) {
-                                            Marker(pin.pinName, coordinate: CLLocationCoordinate2D(latitude: latitude, longitude: longitude))
+                                            Marker(pin.pinName, coordinate: CLLocationCoordinate2D(latitude: latitude, longitude: longitude)).tint(.green)
                                         }
                                     }
-                                }else if selectedRadius == "25mi"{
+                                    
+                                }else {
+                                    //sets user current coords
+                                    let userLatitude = locationManager.location?.coordinate.latitude ?? 0.0
+                                    let userLongitude = locationManager.location?.coordinate.longitude ?? 0.0
+                                    //gets radius selected
+                                    let selectedRadiusInMiles = radiusSlider
+                                    //loops each pin
                                     ForEach(bottom, id: \.id) { pin in
-                                        
-                                        //ERRORING
-                                        //let OUTPUT = distFromUser(userLat: locationManager.location?.coordinate.latitude ?? 0.0, userLong: locationManager.location?.coordinate.longitude ?? 0.0, pinLat: pin.pinLat, pinLong: pin.pinLong)
-                                            
-                                        //if(OUTPUT <= 25.0){
+                                        let pinLatitude = Double(pin.pinLat) ?? 0.0
+                                        let pinLongitude = Double(pin.pinLong) ?? 0.0
+                                        let distance = distFromUser(userLat: userLatitude, userLong: userLongitude, pinLat: pinLatitude, pinLong: pinLongitude)
+
+                                        //makes a pin if and only if it is in the allowed radius
+                                        if distance <= selectedRadiusInMiles {
                                             if let latitude = Double(pin.pinLat), let longitude = Double(pin.pinLong) {
-                                                Marker(pin.pinName, coordinate: CLLocationCoordinate2D(latitude: latitude, longitude: longitude))
-                                            }
-                                        //}
-                                    }
-                                }else if selectedRadius == "50mi"{
-                                    ForEach(bottom, id: \.id) { pin in
-                                        if let latitude = Double(pin.pinLat), let longitude = Double(pin.pinLong) {
-                                            Marker(pin.pinName, coordinate: CLLocationCoordinate2D(latitude: latitude, longitude: longitude))
-                                        }
-                                    }
-                                }else if selectedRadius == "100mi"{
-                                        ForEach(bottom, id: \.id) { pin in
-                                            if let latitude = Double(pin.pinLat), let longitude = Double(pin.pinLong) {
-                                                Marker(pin.pinName, coordinate: CLLocationCoordinate2D(latitude: latitude, longitude: longitude))
+                                                Marker(pin.pinName, coordinate: CLLocationCoordinate2D(latitude: latitude, longitude: longitude)).tint(.green)
                                             }
                                         }
+                                    }
                                 }
-                            }
+                    }
                     //add mapcontrols, TODO:// Fix toggle
-                    .mapStyle(toggle ? .hybrid : .standard)
                     .mapControls(){
                         //MULC not working, not sure why, might be bug from apple themselves
                         MapUserLocationButton().padding(10)
@@ -130,6 +118,7 @@ struct mapHomeView: View {
                     //when map is tapped, calculates screen coord with real coords
                     .onTapGesture { position in
                         //takes screen position
+                        selectedRadius = "All"
                         if let coordinate = proxy.convert(position, from: .local){
                             
                             //saves important info
@@ -168,6 +157,10 @@ struct mapHomeView: View {
                                             .padding(.horizontal)
                                             .keyboardType(.default)
                                     }
+                                    HStack{
+                                        Toggle("Private Pin", isOn: $toggle).tint(.blue).padding(.horizontal)
+                                        Spacer()
+                                    }
                                     //submits all textfield info
                                     Button(action: {
                                         //only if pin is named!
@@ -178,6 +171,7 @@ struct mapHomeView: View {
                                             ctx.insert(newPin)
                                             
                                             //populate postData dictionary with pin data
+                                            
                                             //username will be replaced with users real name
                                             let postData = ["user": "username",
                                                             "pinName": pinNameField,
@@ -187,39 +181,54 @@ struct mapHomeView: View {
                                             
                                             //convert postData to JSON data
                                             do {
-                                                let jsonData = try JSONSerialization.data(withJSONObject: postData, options: [])
-                                                
-                                                //create URL request
-                                                guard let url = URL(string: "http://3.80.118.34:8000/pins.json") else {
-                                                    print("Invalid URL")
-                                                    return
-                                                }
-                                                var request = URLRequest(url: url)
-                                                request.httpMethod = "POST"
-                                                request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-                                                request.httpBody = jsonData
-                                                
-                                                //send POST request
-                                                URLSession.shared.dataTask(with: request) { data, response, error in
-                                                    if let error = error {
-                                                        print("Error: \(error.localizedDescription)")
-                                                    }
-                                                    guard let data = data else {
-                                                        print("No data received")
+                                                //print(postData)
+                                                //let jsonData = try JSONSerialization.data(withJSONObject: postData, options: [])
+                                                    let jsonData = try JSONSerialization.data(withJSONObject: postData) // Simplified
+                                                print(jsonData.count,"jsondata")
+                                                    
+                                                    //create URL request
+                                                    guard let url = URL(string: "http://3.80.118.34:8000/pins.json") else {
+                                                        print("Invalid URL")
                                                         return
                                                     }
-                                                    if let response = String(data: data, encoding: .utf8) {
-                                                        print("Response: \(response)")
-                                                        // Handle response as needed, you may update UI or perform other actions here
-                                                    }
-                                                    Task{
-                                                        await fetchData()
-                                                    }
-                                                }.resume()
-                                            } catch {
-                                                print("Error: \(error.localizedDescription)")
-                                            }
+                                                    
+                                                    
+                                                    var request = URLRequest(url: url)
+                                                    request.httpMethod = "POST"
+                                                    
+                                                    request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+                                                    
+                                                    request.httpBody = jsonData
+                                                    
+                                                    //print(request.httpBody ?? "")
+                                                    
+                                                    
+                                                    //send POST request
+                                                    URLSession.shared.dataTask(with: request) { data, response, error in
+                                                        if let error = error {
+                                                            print("Error: \(error.localizedDescription)")
+                                                            print("if let")
+                                                        }
+                                                        
+                                                        guard let data = data else {
+                                                            print("No data received")
+                                                            return
+                                                        }
+                                                        
+                                                        if let response = String(data: data, encoding: .utf8) {
+                                                            print("Response: \(response)")
+                                                            
+                                                        }
+                                                        Task{
+                                                            await fetchData()
+                                                        }
+                                                    }.resume()
+                                                } catch {
+                                                    print("Error: \(error.localizedDescription)")
+                                                    print("im in the catch")
+                                                }
                                         }
+                                        
                                         //resets all textfields and names
                                         pinNameField = ""
                                         pinDesc = ""
@@ -233,21 +242,30 @@ struct mapHomeView: View {
                                     Spacer()
                                 }
                             }
-                            
                         }
-                        
                     })
+                    
+                    //Slider to choose radius
                     VStack{
-                        //Picker to select radius of pin
-                        Text("Pin Radius: \(selectedRadius)").font(.title).padding(.vertical)
-                        Picker("Please choose a Radius", selection: $selectedRadius) {
-                            ForEach(radius, id: \.self) {
-                                Text($0)
-                            }
-                        }.pickerStyle(.segmented).padding(.horizontal)
+                        //29, 71, 40
                         
+                        Text("\(radiusSlider)mi Radius")
+                        
+                            .foregroundColor(isEditing ? .gray : .black).font(.title).background(Color.green)
+                        Slider(value: $radiusSlider, in: 5...100, step: 5){
+                            Text("mi").padding()
+                        } minimumValueLabel: {
+                            Text("5mi").padding()
+                        } maximumValueLabel: {
+                            Text("All Pins").padding()
+                        } onEditingChanged: { editing in
+                            isEditing = editing
+                        }.background(Color.green)
+
                         Spacer()
                     }
+                    Spacer()
+
                     
                 }
             }.task {
@@ -257,31 +275,27 @@ struct mapHomeView: View {
             }
         
     }
-    
-    func distFromUser(userLat: Double, userLong: Double, pinLat: Double, pinLong: Double) -> Double{
+    func distFromUser(userLat: Double, userLong: Double, pinLat: Double, pinLong: Double) -> Double {
+        let earthRadius = 3959.0 // Earth's radius in miles
         
-        disLat = (pinLat - userLat) * Double.pi / 180.0
-        disLong = (pinLong - userLong) * Double.pi / 180.0
+        let deltaLat = (pinLat - userLat) * .pi / 180.0
+        let deltaLong = (pinLong - userLong) * .pi / 180.0
         
-        //convert to radians
-        nLat = (userLat) * Double.pi / 180.0
-        nLong = (pinLat) * Double.pi / 180.0
+        let a = sin(deltaLat / 2) * sin(deltaLat / 2) +
+                cos(userLat * .pi / 180) * cos(pinLat * .pi / 180) *
+                sin(deltaLong / 2) * sin(deltaLong / 2)
         
-        //how do i get cos and sin in swift AND square root and power
-        a = pow(sin(disLat/2), 2) + pow(sin(disLong/2), 2)*cos(pinLat)
+        let c = 2 * atan2(sqrt(a), sqrt(1 - a))
         
-        rad = 3959
+        let distance = earthRadius * c
         
-        c = 2 * asin(sqrt(a))
-        
-        
-        
-        return Double(rad) * c
-        
-
+        return distance
     }
 
     func fetchData() async {
+        
+        //await Task.sleep(500_000_000) // 0.5 seconds in nanoseconds
+
         //create url
         guard let url = URL(string: "http://3.80.118.34:8000/pins.json") else{
             print("URL NOT VALID")

@@ -107,8 +107,8 @@
 			children = (
 				64743AF22B8D5CE7001784C3 /* Info.plist */,
 				64124A262B3EEC4000A2C53C /* senProjTestApp.swift */,
-				64124A282B3EEC4000A2C53C /* ContentView.swift */,
 				64743AF02B75E093001784C3 /* pinListView.swift */,
+				64124A282B3EEC4000A2C53C /* ContentView.swift */,
 				64743AEE2B707B9A001784C3 /* PinDB.swift */,
 				64224D8A2B6C5AC7005356E3 /* Location.swift */,
 				64124A2A2B3EEC4100A2C53C /* Assets.xcassets */,

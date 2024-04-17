@@ -11,8 +11,13 @@ import SwiftData
 struct aliasChange: View {
     
     @State private var aliasTextBox = ""
-    @State var alias = "Anon"
+    
+    //@Binding var enteredName: String
+    
+    @State var alias = "CQAnonymous"
+    
     @State private var opacitythanks = 0.0
+    
     @State private var opacitycharlen = 0.0
     
 
@@ -33,11 +38,12 @@ struct aliasChange: View {
                                     .padding(.horizontal)
                                     .keyboardType(.default)
                                 
-                                Text("Please keep nickname under 10 characters").foregroundStyle(.red).opacity(opacitycharlen)
+                                Text("Please keep nickname between 1-10 characters").foregroundStyle(.red).opacity(opacitycharlen)
                                 
                                 Button(action: {
                                     if aliasTextBox != "" && aliasTextBox.count < 10{
                                         alias = aliasTextBox
+                                        
                                         //mapHomeView(alias: $alias)
                                         opacitythanks = 1.0
                                         opacitycharlen = 0.0

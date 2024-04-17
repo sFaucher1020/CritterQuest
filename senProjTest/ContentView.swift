@@ -25,13 +25,13 @@ struct ContentView: View {
             pinListView().tabItem {
                 Image(systemName: "pin.fill")
                 Text("Edit Pins")
-            }            
-            aliasChange().tabItem {
-            Image(systemName: "person.fill")
-            Text("Change Name")
             }
-
-        }
+            aliasChange().tabItem {
+                Image(systemName: "person.fill")
+                Text("Change Name")
+            }
+            //49, 110, 65
+        }//.tint(.red)
         
     }
 
