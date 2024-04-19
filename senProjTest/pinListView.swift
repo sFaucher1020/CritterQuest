@@ -11,8 +11,12 @@ import SwiftData
 struct pinListView: View {
     @Environment(\.modelContext) var ctx
     @Query private var pins : [PinDB]
+    
     @State private var searchText = ""
+    
     @State private var id_of_Pin = 0
+    
+    @State private var cellTapped = false
     
     struct pinInfo: Codable{
         var id: Int
@@ -26,14 +30,28 @@ struct pinListView: View {
     enum delError: Error {
         case invalid_Pin_ID
     }
-    //let darkGreen = Color(red: 1.0/255.0, green: 68.0/255.0, blue: 33.0/255.0)
+    
+    //search bar filter
+    var filteredPins: [PinDB] {
+        //if the search bar is empty
+        guard !searchText.isEmpty else {
+            //just returns all pins
+            return pins
+        }
+        //if there is text in search bar
+        return pins.filter { pin in
+            //filters by name or desc
+            pin.name.lowercased().contains(searchText.lowercased()) ||
+            pin.desc.lowercased().contains(searchText.lowercased())
+        }
+    }
 
     var body: some View {
         
         VStack {
             Label("My Pins", systemImage: "pin").padding().foregroundStyle(.blue).labelStyle(.automatic).font(.system(size: 25))
             NavigationStack{
-                List(pins, id: \.name){ pin in
+                List(filteredPins, id: \.name){ pin in
                     HStack{
                         Text(pin.name).swipeActions(){
                             Button(role: .destructive) {
@@ -49,15 +67,35 @@ struct pinListView: View {
                                 Image(systemName: "trash")
                                 Text("Delete")
                             }
+                        }.swipeActions(){
+                            Button {
+                                withAnimation {
+                                    
+                                    if let url = URL(string: "http://maps.apple.com/?q=\(pin.lat),\(pin.long)") {
+                                        UIApplication.shared.open(url, options: [:], completionHandler: nil)
+                                    }
+                                    
+                                    //print("Pin Name: ", pin.name,"Pin Lat: ", pin.lat,"Pin Long: ", pin.long)
+                                    
+//                                    Task{
+//                                        await getpinID(pinLat: String(pin.lat) , pinLong: String(pin.long))
+//                                    }
+                                    //ctx.delete(pin)
+                                }
+                            } label: {
+                                Image(systemName: "map.circle").background(Color.blue)
+                                Text("Open in Maps")
+                            }.tint(.blue)
+                            
                         }
-                        Text(pin.desc)
+                        //Text(pin.desc)
                     }
                     
-                }//.background(darkGreen)
-                //.scrollContentBackground(.hidden)
+                }
                 Spacer()
-            }.searchable(text:$searchText)
+            }.searchable(text: $searchText, prompt: "Search Pins")
         }
+        
     }
     func delReq(pinid: Int) {
         // Construct the URL with the pin ID

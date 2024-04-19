@@ -135,7 +135,11 @@ struct mapHomeView: View {
                             if pinInProgress {
                                 VStack{
                                     HStack{
-                                        Text("New Pin").presentationDetents([.height(200)]).padding(.top).padding(.horizontal)
+                                        Text("Create Pin").font(.title.bold()).padding(.top).padding(.horizontal)
+                                    }
+                                    
+                                    HStack{
+                                        Text("Pin Name").presentationDetents([.height(200)]).padding(.horizontal)
                                         Spacer()
                                     }
                                     
@@ -244,14 +248,18 @@ struct mapHomeView: View {
                             }
                         }
                     })
-                    
                     //Slider to choose radius
                     VStack{
-                        //29, 71, 40
+                        //Dark Green 29, 71, 40 <-- i dont think ill be able to add this color, dont care enough for custom color :P
+                    
+                        //Creates headline n Mi Radius
+                        Text(String(format: "%.0fmi Radius", radiusSlider))
+            .frame(maxWidth: .infinity)
+                            .frame(maxHeight: 30)
+                            .background(Color.green)
+                            .foregroundColor(isEditing ? .gray : .black).font(.headline).background(Color.green)
                         
-                        Text("\(radiusSlider)mi Radius")
-                        
-                            .foregroundColor(isEditing ? .gray : .black).font(.title).background(Color.green)
+                        //Choose a more unique slider radius from 5mi-All Pins
                         Slider(value: $radiusSlider, in: 5...100, step: 5){
                             Text("mi").padding()
                         } minimumValueLabel: {
@@ -261,6 +269,7 @@ struct mapHomeView: View {
                         } onEditingChanged: { editing in
                             isEditing = editing
                         }.background(Color.green)
+                            .frame(maxHeight: 20)
 
                         Spacer()
                     }
